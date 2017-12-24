@@ -155,6 +155,60 @@ lego_get_set_num_parts <- function(set_num, api_key){
 
   lego_data <- lego_get(url = url, api_key = api_key)
 
+  out <- purrr::map_df(lego_data, function(loop_data){
+
+    df <- loop_data
+    df$part <- df$color <- NULL
+
+    df <- tibble::as_tibble(df)
+
+    color <- color_list_to_df(list(loop_data$color))
+    names(color) <- stringr::str_c("color_", names(color))
+
+    part <- parts_list_to_df(list(loop_data$part))
+    names(part) <- stringr::str_c("part_", names(part))
+    names(part) <- stringr::str_replace_all(names(part), "part_part_", "part_")
+
+    df <- dplyr::bind_cols(df, color, part)
+
+    df
+  })
+
+  out
+
+}
+
+lego_get_set_num_sets <- function(set_num, api_key){
+
+  url <- paste0("https://rebrickable.com/api/v3/lego/sets/", set_num, "/sets")
+
+  lego_data <- lego_get(url = url, api_key = api_key)
+
+  out <- lego_data
+
+  out
+
+}
+
+lego_get_themes <- function(api_key){
+
+  url <- "https://rebrickable.com/api/v3/lego/themes"
+
+  lego_data <- lego_get(url = url, api_key = api_key)
+
+  out <- purrr::map_df(lego_data, tibble::as_tibble)
+
+  out
+
+}
+
+lego_get_themes_id <- function(id, api_key){
+
+  url <- "https://rebrickable.com/api/v3/lego/themes"
+
+  lego_data <- lego_get(url = url, api_key = api_key)
+
+  out <- purrr::map_df(lego_data, tibble::as_tibble)
 
   out
 
